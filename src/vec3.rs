@@ -98,6 +98,14 @@ mod tests {
     }
 
     #[test]
+    fn indexes() {
+        let v = Vec3::new(1., 2., 3.);
+        assert_eq!(v[0], 1.);
+        assert_eq!(v[1], 2.);
+        assert_eq!(v[2], 3.);
+    }
+
+    #[test]
     fn normalizes() {
         let v = Vec3::new(1., 2., 3.);
         let n = v.normalize();

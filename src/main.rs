@@ -1,7 +1,9 @@
+mod macros;
 mod mat;
 mod mat3;
 mod mat4;
 mod precision;
+mod quat;
 mod structure;
 mod transform4;
 mod vec;

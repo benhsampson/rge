@@ -1,6 +1,7 @@
 use std::ops;
 
 use crate::{
+    impl_op, impl_op_assign,
     structure::{Mat, SquareMat, VecSpace},
     vec3::Vec3,
 };
@@ -194,35 +195,25 @@ impl SquareMat for Mat3 {
     }
 }
 
-impl ops::Mul<Mat3> for Mat3 {
-    type Output = Self;
-
-    fn mul(self, rhs: Mat3) -> Self::Output {
-        let mut m = Self::ZERO;
-        for i in 0..3 {
-            for j in 0..3 {
-                for k in 0..3 {
-                    m[i][j] += self[k][j] * rhs[i][k];
-                }
+impl_op!(Mat3 : Mat3, ops::Mul { fn mul |lhs: &Mat3, rhs: &Mat3| {
+    let mut m = Mat3::ZERO;
+    for i in 0..3 {
+        for j in 0..3 {
+            for k in 0..3 {
+                m[i][j] += lhs[k][j] * rhs[i][k];
             }
         }
-        m
     }
-}
+    m
+}});
 
-impl ops::MulAssign<Mat3> for Mat3 {
-    fn mul_assign(&mut self, rhs: Mat3) {
-        *self = *self * rhs;
-    }
-}
+impl_op_assign!(Mat3, Mat3, ops::MulAssign { fn mul_assign |lhs: &mut Mat3, rhs: &Mat3| {
+    *lhs = *lhs * rhs;
+}});
 
-impl ops::Mul<Vec3> for Mat3 {
-    type Output = Vec3;
-
-    fn mul(self, rhs: Vec3) -> Self::Output {
-        Vec3::new(rhs.dot(&self.a), rhs.dot(&self.b), rhs.dot(&self.c))
-    }
-}
+impl_op!(Mat3 : Vec3 => Vec3, ops::Mul { fn mul |lhs: &Mat3, rhs: &Vec3| {
+    Vec3::new(lhs.a.dot(rhs), lhs.b.dot(rhs), lhs.c.dot(rhs))
+}});
 
 #[cfg(test)]
 mod tests {

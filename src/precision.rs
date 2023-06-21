@@ -1,6 +1,6 @@
 use float_cmp::{ApproxEq, F32Margin};
 
-use crate::{mat3::Mat3, mat4::Mat4, vec3::Vec3, vec4::Vec4};
+use crate::{mat3::Mat3, mat4::Mat4, quat::Quat, vec3::Vec3, vec4::Vec4};
 
 pub const PRECISION: F32Margin = F32Margin {
     ulps: 2,
@@ -72,6 +72,24 @@ impl ApproxEq for &Mat4 {
 }
 
 impl PartialEq for Mat4 {
+    fn eq(&self, other: &Self) -> bool {
+        self.approx_eq(other, PRECISION)
+    }
+}
+
+impl ApproxEq for &Quat {
+    type Margin = F32Margin;
+
+    fn approx_eq<M: Into<Self::Margin>>(self, other: Self, margin: M) -> bool {
+        let margin = margin.into();
+        self.x.approx_eq(other.x, margin)
+            && self.y.approx_eq(other.y, margin)
+            && self.z.approx_eq(other.z, margin)
+            && self.w.approx_eq(other.w, margin)
+    }
+}
+
+impl PartialEq for Quat {
     fn eq(&self, other: &Self) -> bool {
         self.approx_eq(other, PRECISION)
     }
