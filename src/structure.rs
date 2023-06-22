@@ -17,14 +17,6 @@ where
     Self: Div<f32, Output = Self> + DivAssign<f32>,
     Self: Neg<Output = Self>,
 {
-    fn project_on(&self, on: &Self) -> Self {
-        *on * (self.dot(on) / on.norm2())
-    }
-
-    fn reject_on(&self, on: &Self) -> Self {
-        *self - self.project_on(on)
-    }
-
     fn norm2(&self) -> f32 {
         self.dot(self)
     }
@@ -36,6 +28,14 @@ where
     fn normalize(&self) -> Self {
         *self / self.norm()
     }
+}
+
+pub trait ProjectionSpace<V: VecSpace>
+where
+    Self: EuclideanSpace<V>,
+{
+    fn project(&self, v: &V) -> V;
+    fn reject(&self, v: &V) -> V;
 }
 
 pub trait Mat

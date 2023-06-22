@@ -1,5 +1,5 @@
 use crate::{
-    structure::{EuclideanSpace, VecSpace},
+    structure::{EuclideanSpace, ProjectionSpace, VecSpace},
     vec4::Vec4,
 };
 
@@ -52,11 +52,21 @@ impl Vec3 {
     }
 }
 
-impl VecSpace for Vec3 {}
-
 impl EuclideanSpace<Self> for Vec3 {
     fn dot(&self, other: &Self) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
+    }
+}
+
+impl VecSpace for Vec3 {}
+
+impl ProjectionSpace<Vec3> for Vec3 {
+    fn project(&self, v: &Vec3) -> Vec3 {
+        self * (v.dot(self) / self.norm2())
+    }
+
+    fn reject(&self, v: &Vec3) -> Vec3 {
+        v - self.project(v)
     }
 }
 
@@ -207,7 +217,7 @@ mod tests {
     #[test]
     fn project_works() {
         assert_eq!(
-            Vec3::new(1., 2., 3.).project_on(&Vec3::new(4., 5., 6.)),
+            Vec3::new(4., 5., 6.).project(&Vec3::new(1., 2., 3.)),
             Vec3::new(4., 5., 6.) * (32. / 77.)
         );
     }
@@ -215,7 +225,7 @@ mod tests {
     #[test]
     fn reject_works() {
         assert_eq!(
-            Vec3::new(1., 2., 3.).reject_on(&Vec3::new(4., 5., 6.)),
+            Vec3::new(4., 5., 6.).reject(&Vec3::new(1., 2., 3.)),
             Vec3::new(1., 2., 3.) - Vec3::new(4., 5., 6.) * (32. / 77.)
         );
     }
