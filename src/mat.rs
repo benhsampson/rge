@@ -1,8 +1,8 @@
 use std::ops;
 
 use crate::{
-    impl_algebraic_ops, impl_conversions, impl_index_ops, mat3::Mat3, mat4::Mat4,
-    transform4::Transform4, vec3::Vec3, vec4::Vec4,
+    impl_algebraic_ops, impl_conversions, impl_index_ops, mat3::Mat3, mat4::Mat4, vec3::Vec3,
+    vec4::Vec4,
 };
 
 impl_algebraic_ops!(Mat3 { a, b, c }, Vec3);
@@ -20,21 +20,6 @@ impl_conversions!(Mat4 => [[f32; 4]; 4], |m: &Mat4| {
 impl_conversions!([[f32; 4]; 4] => Mat4, |a: &[[f32; 4]; 4]| {
     Mat4::from_columns(a[0].into(), a[1].into(), a[2].into(), a[3].into())
 });
-impl_conversions!(Transform4 => [[f32; 4]; 4], |m: &Transform4| {
-    [m.a.into(), m.b.into(), m.c.into(), m.p.into()]
-});
-impl_conversions!([[f32; 4]; 4] => Transform4, |a: &[[f32; 4]; 4]| {
-    Transform4::from_columns(a[0].into(), a[1].into(), a[2].into(), a[3].into())
-});
 
 impl_index_ops!(Mat3 { 0 => a, 1 => b, 2 => c } => Vec3);
 impl_index_ops!(Mat4 { 0 => a, 1 => b, 2 => c, 3 => d } => Vec4);
-impl_index_ops!(Transform4 { 0 => a, 1 => b, 2 => c, 3 => p } => Vec4);
-
-impl_conversions!(Transform4 => Mat4, |t: &Transform4| {
-    Mat4::from_columns(t.a, t.b, t.c, t.p)
-});
-
-impl_conversions!(Mat4 => Transform4, |m: &Mat4| {
-    Transform4::from_columns(m.a, m.b, m.c, m.d)
-});

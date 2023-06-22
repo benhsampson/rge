@@ -58,14 +58,6 @@ impl EuclideanSpace<Self> for Vec3 {
     fn dot(&self, other: &Self) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
-
-    fn project_on(&self, on: &Self) -> Self {
-        *on * (self.dot(on) / on.norm2())
-    }
-
-    fn reject_on(&self, on: &Self) -> Self {
-        *self - self.project_on(on)
-    }
 }
 
 #[cfg(test)]

@@ -4,10 +4,6 @@ use std::ops::{
 
 pub trait EuclideanSpace<V: VecSpace> {
     fn dot(&self, other: &V) -> f32;
-
-    fn project_on(&self, on: &V) -> V;
-
-    fn reject_on(&self, on: &V) -> V;
 }
 
 pub trait VecSpace
@@ -21,6 +17,14 @@ where
     Self: Div<f32, Output = Self> + DivAssign<f32>,
     Self: Neg<Output = Self>,
 {
+    fn project_on(&self, on: &Self) -> Self {
+        *on * (self.dot(on) / on.norm2())
+    }
+
+    fn reject_on(&self, on: &Self) -> Self {
+        *self - self.project_on(on)
+    }
+
     fn norm2(&self) -> f32 {
         self.dot(self)
     }

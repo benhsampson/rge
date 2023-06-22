@@ -20,43 +20,29 @@ impl Mat4 {
     }
 }
 
-#[macro_export]
-macro_rules! impl_mat4 {
-    ($M:ty { $($field:ident),+ }) => {
-        impl Mat for $M {
-            type Row = Vec4;
-            type Column = Vec4;
-            type Transpose = $M;
+impl Mat for Mat4 {
+    type Row = Vec4;
+    type Column = Vec4;
+    type Transpose = Mat4;
 
-            const ZERO: Self = Self {
-                $($field: Vec4::ZERO),+
-            };
-
-            fn transpose(&self) -> Self::Transpose {
-                let m = self;
-                [
-                    [m[0][0], m[1][0], m[2][0], m[3][0]],
-                    [m[0][1], m[1][1], m[2][1], m[3][1]],
-                    [m[0][2], m[1][2], m[2][2], m[3][2]],
-                    [m[0][3], m[1][3], m[2][3], m[3][3]],
-                ]
-                .into()
-            }
-        }
-
-        impl std::ops::Mul<Vec4> for $M {
-            type Output = Vec4;
-
-            fn mul(self, rhs: Vec4) -> Self::Output {
-                Vec4::new(
-                    $(rhs.dot(&self.$field),)+
-                )
-            }
-        }
+    const ZERO: Self = Self {
+        a: Vec4::ZERO,
+        b: Vec4::ZERO,
+        c: Vec4::ZERO,
+        d: Vec4::ZERO,
     };
-}
 
-impl_mat4!(Mat4 { a, b, c, d });
+    fn transpose(&self) -> Self::Transpose {
+        let m = self;
+        [
+            [m[0][0], m[1][0], m[2][0], m[3][0]],
+            [m[0][1], m[1][1], m[2][1], m[3][1]],
+            [m[0][2], m[1][2], m[2][2], m[3][2]],
+            [m[0][3], m[1][3], m[2][3], m[3][3]],
+        ]
+        .into()
+    }
+}
 
 impl SquareMat for Mat4 {
     type RowColumn = Vec4;
@@ -133,6 +119,10 @@ impl_op!(Mat4 : Mat4, ops::Mul { fn mul |a: &Mat4, b: &Mat4| {
         }
     }
     m
+}});
+
+impl_op!(Mat4 : Vec4 => Vec4, ops::Mul { fn mul |m: &Mat4, v: &Vec4| {
+    Vec4::new(v.dot(&m.a), v.dot(&m.b), v.dot(&m.c), v.dot(&m.d))
 }});
 
 #[cfg(test)]
