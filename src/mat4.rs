@@ -1,5 +1,6 @@
 use crate::{
-    structure::{Mat, SquareMat, VecSpace},
+    impl_op,
+    structure::{EuclideanSpace, Mat, SquareMat},
     vec3::Vec3,
     vec4::Vec4,
 };
@@ -19,29 +20,43 @@ impl Mat4 {
     }
 }
 
-impl Mat for Mat4 {
-    type Row = Vec4;
-    type Column = Vec4;
-    type Transpose = Mat4;
+#[macro_export]
+macro_rules! impl_mat4 {
+    ($M:ty { $($field:ident),+ }) => {
+        impl Mat for $M {
+            type Row = Vec4;
+            type Column = Vec4;
+            type Transpose = $M;
 
-    const ZERO: Self = Self {
-        a: Vec4::ZERO,
-        b: Vec4::ZERO,
-        c: Vec4::ZERO,
-        d: Vec4::ZERO,
+            const ZERO: Self = Self {
+                $($field: Vec4::ZERO),+
+            };
+
+            fn transpose(&self) -> Self::Transpose {
+                let m = self;
+                [
+                    [m[0][0], m[1][0], m[2][0], m[3][0]],
+                    [m[0][1], m[1][1], m[2][1], m[3][1]],
+                    [m[0][2], m[1][2], m[2][2], m[3][2]],
+                    [m[0][3], m[1][3], m[2][3], m[3][3]],
+                ]
+                .into()
+            }
+        }
+
+        impl std::ops::Mul<Vec4> for $M {
+            type Output = Vec4;
+
+            fn mul(self, rhs: Vec4) -> Self::Output {
+                Vec4::new(
+                    $(rhs.dot(&self.$field),)+
+                )
+            }
+        }
     };
-
-    fn transpose(&self) -> Self::Transpose {
-        let m = self;
-        [
-            [m[0][0], m[1][0], m[2][0], m[3][0]],
-            [m[0][1], m[1][1], m[2][1], m[3][1]],
-            [m[0][2], m[1][2], m[2][2], m[3][2]],
-            [m[0][3], m[1][3], m[2][3], m[3][3]],
-        ]
-        .into()
-    }
 }
+
+impl_mat4!(Mat4 { a, b, c, d });
 
 impl SquareMat for Mat4 {
     type RowColumn = Vec4;
@@ -108,44 +123,41 @@ impl SquareMat for Mat4 {
     }
 }
 
-impl ops::Mul<Self> for Mat4 {
-    type Output = Self;
-
-    fn mul(self, rhs: Mat4) -> Self::Output {
-        let mut m = Self::ZERO;
-        for i in 0..4 {
-            for j in 0..4 {
-                for k in 0..4 {
-                    m[i][j] += self[k][j] * rhs[i][k];
-                }
+impl_op!(Mat4 : Mat4, ops::Mul { fn mul |a: &Mat4, b: &Mat4| {
+    let mut m = Mat4::ZERO;
+    for i in 0..4 {
+        for j in 0..4 {
+            for k in 0..4 {
+                m[i][j] += a[i][k] * b[k][j];
             }
         }
-        m
     }
-}
-
-impl ops::MulAssign<Self> for Mat4 {
-    fn mul_assign(&mut self, rhs: Self) {
-        *self = *self * rhs;
-    }
-}
-
-impl ops::Mul<Vec4> for Mat4 {
-    type Output = Vec4;
-
-    fn mul(self, rhs: Vec4) -> Self::Output {
-        Vec4::new(
-            rhs.dot(&self.a),
-            rhs.dot(&self.b),
-            rhs.dot(&self.c),
-            rhs.dot(&self.d),
-        )
-    }
-}
+    m
+}});
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn matrix_multiplication_works() {
+        let m = Mat4::from([
+            [1., 2., 3., 4.],
+            [5., 6., 7., 8.],
+            [9., 10., 11., 12.],
+            [13., 14., 15., 16.],
+        ]);
+        assert_eq!(
+            m * m.transpose(),
+            [
+                [30., 70., 110., 150.],
+                [70., 174., 278., 382.],
+                [110., 278., 446., 614.],
+                [150., 382., 614., 846.]
+            ]
+            .into()
+        );
+    }
 
     #[test]
     fn transpose_works() {

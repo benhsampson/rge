@@ -2,8 +2,17 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
+pub trait EuclideanSpace<V: VecSpace> {
+    fn dot(&self, other: &V) -> f32;
+
+    fn project_on(&self, on: &V) -> V;
+
+    fn reject_on(&self, on: &V) -> V;
+}
+
 pub trait VecSpace
 where
+    Self: EuclideanSpace<Self>,
     Self: Clone + Copy,
     Self: Index<usize> + IndexMut<usize>,
     Self: Add<Output = Self> + AddAssign,
@@ -12,8 +21,6 @@ where
     Self: Div<f32, Output = Self> + DivAssign<f32>,
     Self: Neg<Output = Self>,
 {
-    fn dot(&self, other: &Self) -> f32;
-
     fn norm2(&self) -> f32 {
         self.dot(self)
     }
@@ -24,14 +31,6 @@ where
 
     fn normalize(&self) -> Self {
         *self / self.norm()
-    }
-
-    fn project_on(&self, on: &Self) -> Self {
-        *on * (self.dot(on) / on.norm2())
-    }
-
-    fn reject_on(&self, on: &Self) -> Self {
-        *self - self.project_on(on)
     }
 }
 

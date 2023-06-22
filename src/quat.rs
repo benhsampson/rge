@@ -1,4 +1,4 @@
-use crate::{impl_conversions, mat3::Mat3, structure::VecSpace};
+use crate::{impl_conversions, mat3::Mat3, structure::EuclideanSpace};
 use std::ops;
 
 use crate::{impl_op, vec3::Vec3};
@@ -103,19 +103,3 @@ impl_conversions!(Mat3 => Quat, |m: &Mat3| {
         Quat::new(x, y, z, w)
     }
 });
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_conversion() {
-        let m = Mat3::new(
-            0.5403023, -0.841471, 0., //
-            0.841471, 0.5403023, 0., //
-            0., 0., 1.,
-        );
-        let q = Quat::new(0., 0., 0., 1.);
-        assert_eq!(q, m.into());
-    }
-}

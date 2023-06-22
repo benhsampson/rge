@@ -5,18 +5,22 @@ use crate::{impl_algebraic_ops, impl_conversions, impl_index_ops, vec3::Vec3, ve
 impl_algebraic_ops!(Vec3 { x, y, z }, 3);
 impl_algebraic_ops!(Vec4 { x, y, z, w }, 4);
 
-impl_conversions!(Vec3 => [f32; 3], |from: &Vec3| {
-    [from.x, from.y, from.z]
+impl_conversions!(Vec3 => [f32; 3], |v: &Vec3| {
+    [v.x, v.y, v.z]
 });
-impl_conversions!([f32; 3] => Vec3, |from: &[f32; 3]| {
-    Vec3::new(from[0], from[1], from[2])
+impl_conversions!([f32; 3] => Vec3, |a: &[f32; 3]| {
+    Vec3::new(a[0], a[1], a[2])
 });
 
-impl_conversions!(Vec4 => [f32; 4], |from: &Vec4| {
-    [from.x, from.y, from.z, from.w]
+impl_conversions!(Vec4 => [f32; 4], |v: &Vec4| {
+    [v.x, v.y, v.z, v.w]
 });
-impl_conversions!([f32; 4] => Vec4, |from: &[f32; 4]| {
-    Vec4::new(from[0], from[1], from[2], from[3])
+impl_conversions!([f32; 4] => Vec4, |a: &[f32; 4]| {
+    Vec4::new(a[0], a[1], a[2], a[3])
+});
+
+impl_conversions!(Vec4 => Vec3, |v4: &Vec4| {
+    Vec3::new(v4.x, v4.y, v4.z)
 });
 
 impl_index_ops!(Vec3 { 0 => x, 1 => y, 2 => z } => f32);

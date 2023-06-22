@@ -2,7 +2,7 @@ use std::ops;
 
 use crate::{
     impl_op, impl_op_assign,
-    structure::{Mat, SquareMat, VecSpace},
+    structure::{EuclideanSpace, Mat, SquareMat},
     vec3::Vec3,
 };
 

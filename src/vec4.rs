@@ -1,4 +1,7 @@
-use crate::{structure::VecSpace, vec3::Vec3};
+use crate::{
+    structure::{EuclideanSpace, VecSpace},
+    vec3::Vec3,
+};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Vec4 {
@@ -53,8 +56,18 @@ impl Vec4 {
     }
 }
 
-impl VecSpace for Vec4 {
+impl VecSpace for Vec4 {}
+
+impl EuclideanSpace<Self> for Vec4 {
     fn dot(&self, other: &Self) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z + self.w * other.w
+    }
+
+    fn project_on(&self, on: &Self) -> Self {
+        *on * (self.dot(on) / on.norm2())
+    }
+
+    fn reject_on(&self, on: &Self) -> Self {
+        *self - self.project_on(on)
     }
 }
